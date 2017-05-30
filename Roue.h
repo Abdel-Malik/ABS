@@ -7,6 +7,9 @@
 #define _Roue_h_
 #include "outilDichotomie.h"
 
+/************************************/
+/******   definition Classe    ******/
+/************************************/
 class Roue{
     //attributs
     double vitesseAngulaire;
@@ -24,16 +27,14 @@ class Roue{
         glissement = 0;
     };
     //méthodes
-    double test(){
-    return rayon;
-    }
+
     void glissementRoue(double v_auto){
         glissement = (v_auto-(vitesseAngulaire*rayon))/v_auto;
-    }
+    };
 
     void dichotomie(ChangementPression choix){
         bornes.dichotomie(choix);
-    }
+    };
     //getter
     double getVitesseAngulaire(){
         return vitesseAngulaire;

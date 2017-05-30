@@ -6,14 +6,21 @@
 #ifndef _outilDichotomie_h_
 #define _outilDichotomie_h_
 
+/************************************/
+/****** definition énumération ******/
+/************************************/
 enum ChangementPression{
     SERRER,
     RELACHER
 };
 
+
+/************************************/
+/******   definition Classe    ******/
+/************************************/
 class BornesDichotomie{
     //attributs
-    static const double ZERO_DICHOTOMIE_REALISEE = -1;
+    static constexpr double ZERO_DICHOTOMIE_REALISEE = -1;
     double inf = 0;
     double sup = 1;
     double index = ZERO_DICHOTOMIE_REALISEE;
@@ -23,7 +30,7 @@ class BornesDichotomie{
     BornesDichotomie(){
     };
     void dichotomie(ChangementPression choix){
-        if((int)index == ZERO_DICHOTOMIE_REALISEE)
+        if(index == ZERO_DICHOTOMIE_REALISEE)
             index = (inf+sup)/2;
         else{
             if(choix == ChangementPression::SERRER){
@@ -35,7 +42,7 @@ class BornesDichotomie{
                 index = (inf+sup)/2;
             }
         }
-    }
+    };
     //getter
     double getInf(){
         return inf;

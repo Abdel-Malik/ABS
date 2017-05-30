@@ -12,6 +12,5 @@ int main()
 {
 
     ABS abs = ABS();
-    abs.test();
     return 0;
 }
