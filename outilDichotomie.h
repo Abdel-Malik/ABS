@@ -18,17 +18,26 @@ enum ChangementPression{
 /************************************/
 /******   definition Classe    ******/
 /************************************/
+
 class BornesDichotomie{
-    //attributs
+
+    ///**attributs**///
     static constexpr double ZERO_DICHOTOMIE_REALISEE = -1;
     double inf = 0;
     double sup = 1;
     double index = ZERO_DICHOTOMIE_REALISEE;
-    //méthodes
+
+    ///**Méthodes**///
     public:
-    //Constructeurs
+    /*Constructeurs*/
     BornesDichotomie(){
     };
+
+    /*méthodes*/
+
+    //param :
+    //in : l'évolution souhaité d'une étape de dichotomie (Sérrer / Relacher)
+    //but : modifier la valeur de freinage par dichotomie
     void dichotomie(ChangementPression choix){
         if(index == ZERO_DICHOTOMIE_REALISEE)
             index = (inf+sup)/2;
@@ -43,7 +52,22 @@ class BornesDichotomie{
             }
         }
     };
-    //getter
+
+    //but : mettre à jour l'intervalle d'exécution de la dichotomie (zone réduisant l'intervalle de pressions applicable)
+    void versIntervalleFaible(){
+        sup = index;
+        inf = 0;
+        index = ZERO_DICHOTOMIE_REALISEE;
+    };
+
+    //but : mettre à jour l'intervalle d'exécution de la dichotomie (zone augmentant l'intervalle de pressions applicable)
+    void versIntervalleFort(){
+        sup = 1;
+        inf = index;
+        index = ZERO_DICHOTOMIE_REALISEE;
+    };
+
+    /*getter*/
     double getInf(){
         return inf;
     };
@@ -53,7 +77,8 @@ class BornesDichotomie{
     double getIndex(){
         return index;
     };
-    //setter
+
+    /*setter*/
     void setInf(double i){
         inf = i;
     };
