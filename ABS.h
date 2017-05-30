@@ -18,15 +18,16 @@
 /******   definition Classe    ******/
 /************************************/
 
-/** La classe ABS est la classe modélisant un fonctionnement d'un ABS
+/** La classe ABS est la classe modélisant le fonctionnement d'un ABS
 agissant sur chaque roue du véhicule sur lequel il est employé. **/
 class ABS{
+
     ///**attributs**///
     std::vector<Roue> rouesVehicule;
     std::vector<int> rouesASerrer;
     std::vector<int> rouesARelacher;
     double chargeFrein;
-    char cpt;
+    char compteur;
     static constexpr double GLISSEMENT_OPTIMAL = 0.18;
     static constexpr double alpha = 0.015;
 
@@ -37,9 +38,25 @@ class ABS{
         initialiserRoues();
     };
     /*méthodes*/
+
+    //but : Simuler le comportement de l'ABS
+    //La phase 1 permet de détecter le besoin d'activer l'ABS. (boucle utilisé une seule fois)
+    //Le groupement des phases 2 et 3 assure le fonctionnement continuel de l'ABS Si
+    //le véhicule roule et la pédale de frein est enclenchée.
+    void principale(){
+        bool fonctionnementABS = true;
+        bool pedaleRelachee = false;
+        phase1();
+        do{
+            pedaleRelachee = phase2();
+            fonctionnementABS = phase3();
+        }while(fonctionnementABS && !pedaleRelachee); //et vitesse > 5
+    };
+
+    private:
     //but : vérifie l'absence de blocage des roues
     //Une fois un blocage constaté,
-    //un premier relachement des frein est executé puis la phase s'arrête
+    //un premier relachement des freins est executé puis la phase s'arrête
     void phase1(){
         do{
             Sleep(40);
@@ -47,26 +64,30 @@ class ABS{
         }while(!blocageRoues());
         //set valeur sup de la borne dichotomique des roues (c%)
         relacherRoues();
-
     };
 
     //but : Réaliser une dichotomie sur les roues ayant un glissement non optimal
     //Après 3 boucles conservant un glissment optimal, cette phase s'arrête
+    //Si la pédale
     void phase2(){
+        bool pedale = false;
         do{
             Sleep(40);
             calculGlissement();
             glissementNonOptimal();
             if((rouesARelacher.size()+rouesASerrer.size()) == 0)
-                cpt++;
+                compteur++;
             else{
-                cpt = 0;
+                compteur = 0;
                 relacherRoues();
                 serrerRoues();
             }
-        }while(cpt < 3);
-    };
+        }while(compteur < 3 && !pedale);
+        return pedale;
+    };//TODO modifier la sortie à TRUE si la pedale de frein est relaché
 
+    //param :
+    //out : booléen définissant si une modification significative des valeurs de glissement des roues à eu lieu
     //but : Vérifier la conservation du glissement optimal ainsi que le besoin de freiner
     //Si le conducteur lâche suffisamment la pédale, l'ABS s'arrête.
     //Si le véhicule perd/gagne de l'adhérence,
@@ -86,27 +107,29 @@ class ABS{
         }while((rouesARelacher.size()+rouesASerrer.size()) == 0);
         if(chgmtGliss){
             calculGlissement();
-            ModifierBornes();
+            modifierBornes();
         }
         return chgmtGliss;
     };
 
-    void principale(){
-        phase1();
-        phase2();
-        phase3();
-    };
-    private:
-    void initialiserRoues(){
-        for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++)
+    //param :
+    //in : le nombre de roues à créer/stocker
+    //but : Initialise un tableau contenant les n roues du véhicule simulé. [nécessité de remplacer n par une méthode récupérant cette valeur]
+    void initialiserRoues(int n){
+        for(unsigned int i = 0 ; i < n ; i++)
             rouesVehicule.push_back(Roue());
     };
+
+    //but : calculer le glissement de chaque roue au moment de l'appel.
+    //Met à jour la vitesse angulaire des roues, appel d'une methode[classe Roue] calculant le glissement pour une vitesse donnée en paramêtre
     void calculGlissement(){
         for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++){
             rouesVehicule[i].setVitesseAngulaire(i);
             rouesVehicule[i].glissementRoue(15); //Vitesse du véhicule en paramètre
         }
     };
+
+    //but : Remplir les listes "rouesASerrer" et "rouesARelacher" avec les indices des roues sur lesquelles effectuer des modifications.
     void glissementNonOptimal(){
         for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++){
             if(rouesVehicule[i].getGlissement() < GLISSEMENT_OPTIMAL-alpha)
@@ -116,8 +139,21 @@ class ABS{
 
         }
     };
-    void ModifierBornes(){
+
+    //but : Mettre à jour les bornes sur lesquelles la dichotomie est réalisée
+    //boucle 1 : La roue à brusquement perdu de l'adhérence. Les nouvelles bornes sont : [0 - la pression actuelle (devenu trop importante)]
+    //boucle 2 : La roue à brusquement gagné de l'adhérence. Les nouvelles bornes sont : [la pression actuelle (devenu trop faible) - 1]
+    void modifierBornes(){
+        for(int& r : rouesARelacher){
+            rouesVehicule[r].bornesIntervalleFaible();
+        }
+        for(int& r : rouesASerrer){
+            rouesVehicule[r].bornesIntervalleFort();
+        }
     };
+
+    //but : détecter un blocage des roues
+    //si le glissement d'une roue s'approche grandement de 1, alors elle est considérée bloquée.
     bool blocageRoues(){
         bool res = false;
         for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++){
@@ -128,11 +164,15 @@ class ABS{
         }
         return res;
     };
+
+    //but : relacher les roues trop serrées par le freinage.
     void relacherRoues(){
         for(int& r : rouesARelacher){
             rouesVehicule[r].dichotomie(ChangementPression::RELACHER);
         }
     };
+
+    //but : serrer les roues pas assez solicitées par le freinage.
     void serrerRoues(){
         for(int& r : rouesASerrer){
             rouesVehicule[r].dichotomie(ChangementPression::SERRER);
