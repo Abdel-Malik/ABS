@@ -84,7 +84,6 @@ class Roue{
         glissement = g;
     };
 
-
 };
 
 #endif

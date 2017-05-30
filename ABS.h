@@ -13,7 +13,7 @@
 #include <string.h>
 #include <windows.h>
 #include "Roue.h"
-
+#define NB_ROUES (4)
 /************************************/
 /******   definition Classe    ******/
 /************************************/
@@ -35,7 +35,7 @@ class ABS{
     public:
     /*Constructeurs*/
     ABS(){
-        initialiserRoues();
+        initialiserRoues(NB_ROUES);
     };
     /*méthodes*/
 
@@ -69,7 +69,7 @@ class ABS{
     //but : Réaliser une dichotomie sur les roues ayant un glissement non optimal
     //Après 3 boucles conservant un glissment optimal, cette phase s'arrête
     //Si la pédale
-    void phase2(){
+    bool phase2(){
         bool pedale = false;
         do{
             Sleep(40);
@@ -116,7 +116,7 @@ class ABS{
     //in : le nombre de roues à créer/stocker
     //but : Initialise un tableau contenant les n roues du véhicule simulé. [nécessité de remplacer n par une méthode récupérant cette valeur]
     void initialiserRoues(int n){
-        for(unsigned int i = 0 ; i < n ; i++)
+        for(int i = 0 ; i < n ; i++)
             rouesVehicule.push_back(Roue());
     };
 
@@ -179,9 +179,8 @@ class ABS{
         }
     };
     public:
-    //getter
+    /*getter*/
 
-    //setter
-
+    /*setter*/
 };
 #endif
