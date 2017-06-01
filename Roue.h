@@ -5,6 +5,8 @@
 ///////////////////////////////////////////////////////////////*/
 #ifndef _Roue_h_
 #define _Roue_h_
+
+#include "Intermediaire.h"
 #include "outilDichotomie.h"
 
 /************************************/
@@ -16,6 +18,8 @@ cette roue contient les informations utiles pour une manipulation par l'ABS. **/
 class Roue{
 
     ///**attributs**///
+    Intermediaire* inter;
+    int noRoue;
     double vitesseAngulaire;
     double rayon;
     double glissement;
@@ -24,10 +28,12 @@ class Roue{
     ///**Méthodes**///
     public:
     /*Constructeurs*/
-    Roue(){
+    Roue(double r, Intermediaire* i, int no){
+        noRoue = no;
+        inter = i;
         bornes = BornesDichotomie();
         vitesseAngulaire = 0;
-        rayon = 7;
+        rayon = r;
         glissement = 0;
     };
     /*méthodes*/
@@ -36,7 +42,9 @@ class Roue{
     //in : la vitesse du véhicule
     //but : calculer le glissement de la roue en fonction de la vitesse du véhicule.
     void glissementRoue(double v_auto){
+        v_auto = v_auto/3.6;
         glissement = (v_auto-(vitesseAngulaire*rayon))/v_auto;
+        std::cout << "G "<<noRoue<<": "<< glissement<<"vitesse : "<<v_auto*3.6<<" roue "<<vitesseAngulaire*rayon<< std:: endl;
     };
 
     //param :
@@ -82,6 +90,15 @@ class Roue{
     };
     void setGlissement(double g){
         glissement = g;
+    };
+
+    void setFreinageRoue(double f){
+        bornes.setSup(f);
+    }
+
+    //but : mettre à jour l'intervalle d'exécution de la dichotomie (zone augmentant l'intervalle de pressions applicable)
+    void majDonnees(Intermediaire* inter){
+        vitesseAngulaire = (*inter).getVitesseAngulaire(noRoue);
     };
 
 };

@@ -12,5 +12,6 @@ int main()
 {
 
     ABS abs = ABS();
+    abs.principale();
     return 0;
 }

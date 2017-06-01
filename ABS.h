@@ -13,6 +13,7 @@
 #include <string.h>
 #include <windows.h>
 #include "Roue.h"
+#include "Intermediaire.h"
 #define NB_ROUES (4)
 /************************************/
 /******   definition Classe    ******/
@@ -23,11 +24,12 @@ agissant sur chaque roue du véhicule sur lequel il est employé. **/
 class ABS{
 
     ///**attributs**///
+    Intermediaire i = Intermediaire();
     std::vector<Roue> rouesVehicule;
     std::vector<int> rouesASerrer;
     std::vector<int> rouesARelacher;
-    double chargeFrein;
     char compteur;
+    double chargeFrein;
     static constexpr double GLISSEMENT_OPTIMAL = 0.18;
     static constexpr double alpha = 0.015;
 
@@ -35,7 +37,8 @@ class ABS{
     public:
     /*Constructeurs*/
     ABS(){
-        initialiserRoues(NB_ROUES);
+        chargeFrein = i.getChargeFrein();
+        initialiserRoues(i.getNbRoues());
     };
 
     /*méthodes publiques*/
@@ -46,12 +49,19 @@ class ABS{
     //le véhicule roule et la pédale de frein est enclenchée.
     void principale(){
         bool fonctionnementABS = true;
-        bool pedaleRelachee = false;
         phase1();
+        std::cout << " -- Fin Phase1 -- " << std:: endl;
         do{
-            pedaleRelachee = phase2();
+            if(phase2()){
+                for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++){
+                    rouesVehicule[i].setFreinageRoue(this->i.getChargeFrein());
+                }
+                break;
+            }
+            std::cout << " -- Fin Phase2 -- " << std:: endl;
             fonctionnementABS = phase3();
-        }while(fonctionnementABS && !pedaleRelachee); //et vitesse > 5
+            std::cout << " -- Fin Phase3 -- " << std:: endl;
+        }while(fonctionnementABS && (this->i.getVitesse()>5)); //et vitesse > 5
     };
 
     /*getter*/
@@ -61,6 +71,7 @@ class ABS{
     ///**Méthodes privées**///
 
     private:
+
     //but : vérifie l'absence de blocage des roues
     //Une fois un blocage constaté,
     //un premier relachement des freins est executé puis la phase s'arrête
@@ -68,8 +79,13 @@ class ABS{
         do{
             Sleep(40);
             calculGlissement();
+            affichageGlissement(0);
         }while(!blocageRoues());
-        //set valeur sup de la borne dichotomique des roues (c%)
+            calculGlissement();
+            chargeFrein = this->i.getChargeFrein();
+        for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++){
+            this->i.setFreinageRoue(chargeFrein,i);
+        }
         relacherRoues();
     };
 
@@ -78,7 +94,9 @@ class ABS{
     //Si la pédale
     bool phase2(){
         bool pedale = false;
+        double chrgFrein2;
         do{
+            affichageGlissement(0);
             Sleep(40);
             calculGlissement();
             glissementNonOptimal();
@@ -88,6 +106,11 @@ class ABS{
                 compteur = 0;
                 relacherRoues();
                 serrerRoues();
+            }
+            chrgFrein2 = this->i.getChargeFrein();
+            if(chargeFrein > 2*chrgFrein2){
+                chargeFrein = chrgFrein2;
+                pedale = true;
             }
         }while(compteur < 3 && !pedale);
         return pedale;
@@ -106,14 +129,15 @@ class ABS{
             Sleep(40);
             calculGlissement();
             glissementNonOptimal();
-            if(chargeFrein > 2*chrgFrein2){
+            chrgFrein2 = this->i.getChargeFrein();
+            if(chargeFrein > 2*chrgFrein2 || (this->i.getVitesse()<5)){
                 chgmtGliss = false;
                 chargeFrein = chrgFrein2;
                 break;
             }
         }while((rouesARelacher.size()+rouesASerrer.size()) == 0);
         if(chgmtGliss){
-            calculGlissement();
+            //calculGlissement();
             modifierBornes();
         }
         return chgmtGliss;
@@ -124,16 +148,25 @@ class ABS{
     //but : Initialise un tableau contenant les n roues du véhicule simulé. [nécessité de remplacer n par une méthode récupérant cette valeur]
     void initialiserRoues(int n){
         for(int i = 0 ; i < n ; i++)
-            rouesVehicule.push_back(Roue());
+            rouesVehicule.push_back(Roue(this->i.getRayonRoues(i),&(this->i),i));
     };
 
     //but : calculer le glissement de chaque roue au moment de l'appel.
     //Met à jour la vitesse angulaire des roues, appel d'une methode[classe Roue] calculant le glissement pour une vitesse donnée en paramêtre
     void calculGlissement(){
+        this->i.majDonnees();
         for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++){
-            rouesVehicule[i].setVitesseAngulaire(i);
-            rouesVehicule[i].glissementRoue(15); //Vitesse du véhicule en paramètre
+            rouesVehicule[i].majDonnees(&(this->i));
+            rouesVehicule[i].glissementRoue(this->i.getVitesse()); //Vitesse du véhicule en paramètre
         }
+    };
+
+   void affichageGlissement(){
+        for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++)
+            std::cout << "glissement r"<<i<<": "<< rouesVehicule[i].getGlissement()<< std:: endl;
+    };
+    void affichageGlissement(int i){
+        std::cout << "glissement r"<<i<<": "<< rouesVehicule[i].getGlissement()<< std:: endl;
     };
 
     //but : Remplir les listes "rouesASerrer" et "rouesARelacher" avec les indices des roues sur lesquelles effectuer des modifications.
@@ -164,7 +197,7 @@ class ABS{
     bool blocageRoues(){
         bool res = false;
         for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++){
-            if(rouesVehicule[i].getGlissement() > 0.95){
+            if(rouesVehicule[i].getGlissement() > 0.85){
                 res = true;
                 rouesARelacher.push_back(i); //Liste d'index des roues bloquées
             }
@@ -176,14 +209,18 @@ class ABS{
     void relacherRoues(){
         for(int& r : rouesARelacher){
             rouesVehicule[r].dichotomie(ChangementPression::RELACHER);
+            i.setFreinageRoue(r,rouesVehicule[r].pressionAppliquee());
         }
+        rouesARelacher.resize(0);
     };
 
     //but : serrer les roues pas assez solicitées par le freinage.
     void serrerRoues(){
         for(int& r : rouesASerrer){
             rouesVehicule[r].dichotomie(ChangementPression::SERRER);
+            i.setFreinageRoue(r,rouesVehicule[r].pressionAppliquee());
         }
+        rouesASerrer.resize(0);
     };
 };
 #endif
