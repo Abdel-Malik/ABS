@@ -37,7 +37,8 @@ class ABS{
     ABS(){
         initialiserRoues(NB_ROUES);
     };
-    /*méthodes*/
+
+    /*méthodes publiques*/
 
     //but : Simuler le comportement de l'ABS
     //La phase 1 permet de détecter le besoin d'activer l'ABS. (boucle utilisé une seule fois)
@@ -52,6 +53,12 @@ class ABS{
             fonctionnementABS = phase3();
         }while(fonctionnementABS && !pedaleRelachee); //et vitesse > 5
     };
+
+    /*getter*/
+
+    /*setter*/
+
+    ///**Méthodes privées**///
 
     private:
     //but : vérifie l'absence de blocage des roues
@@ -178,9 +185,5 @@ class ABS{
             rouesVehicule[r].dichotomie(ChangementPression::SERRER);
         }
     };
-    public:
-    /*getter*/
-
-    /*setter*/
 };
 #endif
