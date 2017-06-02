@@ -13,7 +13,7 @@
 #include <string.h>
 #include <windows.h>
 #include "Roue.h"
-#include "Intermediaire.h"
+#include "../IntermediaireG/IntermediaireG.h"
 #define NB_ROUES (4)
 /************************************/
 /******   definition Classe    ******/
@@ -24,7 +24,7 @@ agissant sur chaque roue du véhicule sur lequel il est employé. **/
 class ABS{
 
     ///**attributs**///
-    Intermediaire i = Intermediaire();
+    IntermediaireG i = IntermediaireG();
     std::vector<Roue> rouesVehicule;
     std::vector<int> rouesASerrer;
     std::vector<int> rouesARelacher;
@@ -50,7 +50,7 @@ class ABS{
     void principale(){
         bool fonctionnementABS = true;
         phase1();
-        std::cout << " -- Fin Phase1 -- " << std:: endl;
+        std::cout << "\n -- Fin Phase1 -- \n" << std:: endl;
         do{
             if(phase2()){
                 for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++){
@@ -58,9 +58,9 @@ class ABS{
                 }
                 break;
             }
-            std::cout << " -- Fin Phase2 -- " << std:: endl;
+            std::cout << "\n -- Fin Phase2 --  \n" << std:: endl;
             fonctionnementABS = phase3();
-            std::cout << " -- Fin Phase3 -- " << std:: endl;
+            std::cout << "\n -- Fin Phase3 --  \n" << std:: endl;
         }while(fonctionnementABS && (this->i.getVitesse()>5)); //et vitesse > 5
     };
 
@@ -163,7 +163,7 @@ class ABS{
 
    void affichageGlissement(){
         for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++)
-            std::cout << "glissement r"<<i<<": "<< rouesVehicule[i].getGlissement()<< std:: endl;
+            std::cout <<"--\n"<< "glissement r"<<i<<": "<< rouesVehicule[i].getGlissement()<<"--\n"<< std:: endl;
     };
     void affichageGlissement(int i){
         std::cout << "glissement r"<<i<<": "<< rouesVehicule[i].getGlissement()<< std:: endl;

@@ -6,7 +6,7 @@
 #ifndef _Roue_h_
 #define _Roue_h_
 
-#include "Intermediaire.h"
+#include "../IntermediaireG/IntermediaireG.h"
 #include "outilDichotomie.h"
 
 /************************************/
@@ -18,7 +18,7 @@ cette roue contient les informations utiles pour une manipulation par l'ABS. **/
 class Roue{
 
     ///**attributs**///
-    Intermediaire* inter;
+    IntermediaireG* inter;
     int noRoue;
     double vitesseAngulaire;
     double rayon;
@@ -28,7 +28,7 @@ class Roue{
     ///**Méthodes**///
     public:
     /*Constructeurs*/
-    Roue(double r, Intermediaire* i, int no){
+    Roue(double r, IntermediaireG* i, int no){
         noRoue = no;
         inter = i;
         bornes = BornesDichotomie();
@@ -97,7 +97,7 @@ class Roue{
     }
 
     //but : mettre à jour l'intervalle d'exécution de la dichotomie (zone augmentant l'intervalle de pressions applicable)
-    void majDonnees(Intermediaire* inter){
+    void majDonnees(IntermediaireG* inter){
         vitesseAngulaire = (*inter).getVitesseAngulaire(noRoue);
     };
 
