@@ -1,32 +1,33 @@
-/*///////////////////////////////////////////////////////////////
-// * Author : Abdel-Malik Bouhassoun
-// * Date : 29 Mai 2017
-// Ce header contient ...todo...
-///////////////////////////////////////////////////////////////*/
+﻿/**------------------------------
+ * \Author Abdel-Malik Bouhassoun
+ * \date 29 Mai 2017
+ * Ce header contient ...todo...
+ */
+
 #ifndef _outilDichotomie_h_
 #define _outilDichotomie_h_
 
-/************************************/
-/****** definition énumération ******/
-/************************************/
+//--************************************--//
+//--****** definition énumération ******--//
+//--************************************--//
 enum ChangementPression{
     SERRER,
     RELACHER
 };
 
-/************************************/
-/******   definition Classe    ******/
-/************************************/
+//--************************************--//
+//--******   definition Classe    ******--//
+//--************************************--//
 
 class BornesDichotomie{
 
-    ///**attributs**///
+    //--*attributs*--//
     static constexpr double ZERO_DICHOTOMIE_REALISEE = -1;
     double inf = 0;
     double sup = 1;
     double index = ZERO_DICHOTOMIE_REALISEE;
 
-    ///**Méthodes**///
+    //--*Méthodes*--//
     public:
     /*Constructeurs*/
     BornesDichotomie(){
@@ -34,9 +35,9 @@ class BornesDichotomie{
 
     /*méthodes*/
 
-    //param :
-    //in : l'évolution souhaité d'une étape de dichotomie (Sérrer / Relacher)
-    //but : modifier la valeur de freinage par dichotomie
+    /** \brief  modifier la valeur de freinage par dichotomie
+     * \param[in] choix l'évolution souhaité d'une étape de dichotomie (Sérrer / Relacher)
+     */
     void dichotomie(ChangementPression choix){
         if(index == ZERO_DICHOTOMIE_REALISEE)
             index = (inf+sup)/2;
@@ -52,14 +53,16 @@ class BornesDichotomie{
         }
     };
 
-    //but : mettre à jour l'intervalle d'exécution de la dichotomie (zone réduisant l'intervalle de pressions applicable)
+    /** \brief  mettre à jour l'intervalle d'exécution de la dichotomie (zone réduisant l'intervalle de pressions applicable)
+     */
     void versIntervalleFaible(){
         sup = index;
         inf = 0;
         index = ZERO_DICHOTOMIE_REALISEE;
     };
 
-    //but : mettre à jour l'intervalle d'exécution de la dichotomie (zone augmentant l'intervalle de pressions applicable)
+    /** \brief  mettre à jour l'intervalle d'exécution de la dichotomie (zone augmentant l'intervalle de pressions applicable)
+     */
     void versIntervalleFort(){
         sup = 1;
         inf = index;

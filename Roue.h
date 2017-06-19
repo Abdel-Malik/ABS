@@ -1,23 +1,24 @@
-/*///////////////////////////////////////////////////////////////
-// * Author : Abdel-Malik Bouhassoun
-// * Date : 29 Mai 2017
-// Ce header contient ...todo...
-///////////////////////////////////////////////////////////////*/
+﻿/**------------------------------
+ * \Author Abdel-Malik Bouhassoun
+ * \date 29 Mai 2017
+ * Ce header contient ...todo...
+ */
+
 #ifndef _Roue_h_
 #define _Roue_h_
 
 #include "../IntermediaireG/IntermediaireG.h"
 #include "outilDichotomie.h"
 
-/************************************/
-/******   definition Classe    ******/
-/************************************/
+//--************************************--//
+//--******   definition Classe    ******--//
+//--************************************--//
 
-/** La classe Roue est la classe se raportant à une roue du véhicule simulé,
+/** \file La classe Roue est la classe se raportant à une roue du véhicule simulé,
 cette roue contient les informations utiles pour une manipulation par l'ABS. **/
 class Roue{
 
-    ///**attributs**///
+    //--*attributs*--//
     IntermediaireG* inter;
     int noRoue;
     double vitesseAngulaire;
@@ -25,7 +26,7 @@ class Roue{
     double glissement;
     BornesDichotomie bornes;
 
-    ///**Méthodes**///
+    //--*Méthodes*--//
     public:
     /*Constructeurs*/
     Roue(double r, IntermediaireG* i, int no){
@@ -38,28 +39,31 @@ class Roue{
     };
     /*méthodes*/
 
-    //param :
-    //in : la vitesse du véhicule
-    //but : calculer le glissement de la roue en fonction de la vitesse du véhicule.
+
+    /** \brief calculer le glissement de la roue en fonction de la vitesse du véhicule.
+     * \param[in] v_auto la vitesse du véhicule
+     */
     void glissementRoue(double v_auto){
         v_auto = v_auto/3.6;
         glissement = (v_auto-(vitesseAngulaire*rayon))/v_auto;
         std::cout << "G "<<noRoue<<": "<< glissement<<"vitesse : "<<v_auto*3.6<<" roue "<<vitesseAngulaire*rayon<< std:: endl;
     };
 
-    //param :
-    //in : l'évolution souhaité d'une étape de dichotomie (Serrer / Relacher)
-    //but : modifier la valeur de freinage par dichotomie
+    /** \brief modifier la valeur de freinage par dichotomie
+     * \param[in] choix l'évolution souhaité d'une étape de dichotomie (Serrer / Relacher)
+     */
     void dichotomie(ChangementPression choix){
         bornes.dichotomie(choix);
     };
 
-    //but : mettre à jour l'intervalle d'exécution de la dichotomie (zone réduisant l'intervalle de pressions applicable)
+    /** \brief mettre à jour l'intervalle d'exécution de la dichotomie (zone réduisant l'intervalle de pressions applicable)
+     */
     void bornesIntervalleFaible(){
         bornes.versIntervalleFaible();
     };
 
-    //but : mettre à jour l'intervalle d'exécution de la dichotomie (zone augmentant l'intervalle de pressions applicable)
+    /** \brief mettre à jour l'intervalle d'exécution de la dichotomie (zone augmentant l'intervalle de pressions applicable)
+     */
     void bornesIntervalleFort(){
         bornes.versIntervalleFort();
     };
@@ -96,7 +100,8 @@ class Roue{
         bornes.setSup(f);
     }
 
-    //but : mettre à jour l'intervalle d'exécution de la dichotomie (zone augmentant l'intervalle de pressions applicable)
+    /** \brief mettre à jour l'intervalle d'exécution de la dichotomie (zone augmentant l'intervalle de pressions applicable)
+     */
     void majDonnees(IntermediaireG* inter){
         vitesseAngulaire = (*inter).getVitesseAngulaire(noRoue);
     };

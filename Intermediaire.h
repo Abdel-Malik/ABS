@@ -1,10 +1,7 @@
-﻿/*///////////////////////////////////////////////////////////////
-// * Author : Abdel-Malik Bouhassoun
-// * Date : 01 Juin 2017
-// Ce header contient une classe intermédiaire
-// Cette classe permet de déplacer le problème de la réception de données
-//des classes principales pour pouvoir terminer la création de celles-ci.
-///////////////////////////////////////////////////////////////*/
+﻿/**------------------------------
+ * \Author Abdel-Malik Bouhassoun
+ * \date 01 Juin 2017
+ */
 #ifndef _Intermediaire_h_
 #define _Intermediaire_h_
 
@@ -13,9 +10,12 @@
 #include <string.h>
 #include <math.h>
 
+/** \file Cette classe permet de déplacer le problème de la réception de données
+ * des classes principales pour pouvoir terminer la création de celles-ci.
+ */
 class Intermediaire{
 
-    /**attributs**/
+    /*--attributs--*/
     //Véhicule
     int currentGear;
     int nbRoues;
@@ -40,7 +40,7 @@ class Intermediaire{
     int event = 0;
 
 
-    /**Méthodes**/
+    /*--Méthodes--*/
 
     public:
     //Constructeurs
@@ -90,7 +90,7 @@ class Intermediaire{
         freinRoues[i] = chrg;
     };
 
-    /**Méthodes privées**/
+    /*--Méthodes privées--*/
 
     private:
     void recuperationDonnees(){

@@ -1,8 +1,9 @@
-/*///////////////////////////////////////////////////////////////
-// * Author : Abdel-Malik Bouhassoun
-// * Date : 29 Mai 2017
-// Ce header contient ...todo...
-///////////////////////////////////////////////////////////////*/
+﻿/**------------------------------
+ * \Author Abdel-Malik Bouhassoun
+ * \date 29 Mai 2017
+ * Ce header contient ...todo...
+ */
+
 #ifndef _ABS_h_
 #define _ABS_h_
 
@@ -15,15 +16,16 @@
 #include "Roue.h"
 #include "../IntermediaireG/IntermediaireG.h"
 #define NB_ROUES (4)
-/************************************/
-/******   definition Classe    ******/
-/************************************/
+//--**********************************--/
+//--*****   definition Classe    *****--/
+//--**********************************--/
 
-/** La classe ABS est la classe modélisant le fonctionnement d'un ABS
-agissant sur chaque roue du véhicule sur lequel il est employé. **/
+/** \file La classe ABS est la classe modélisant le fonctionnement d'un ABS
+ * agissant sur chaque roue du véhicule sur lequel il est employé.
+ */
 class ABS{
 
-    ///**attributs**///
+    //--attributs--//
     IntermediaireG i = IntermediaireG();
     std::vector<Roue> rouesVehicule;
     std::vector<int> rouesASerrer;
@@ -33,7 +35,7 @@ class ABS{
     static constexpr double GLISSEMENT_OPTIMAL = 0.18;
     static constexpr double alpha = 0.015;
 
-    ///**Méthodes**///
+    //--Méthodes--//
     public:
     /*Constructeurs*/
     ABS(){
@@ -43,7 +45,8 @@ class ABS{
 
     /*méthodes publiques*/
 
-    //but : Simuler le comportement de l'ABS
+    /** \brief Simuler le comportement de l'ABS
+     */
     //La phase 1 permet de détecter le besoin d'activer l'ABS. (boucle utilisé une seule fois)
     //Le groupement des phases 2 et 3 assure le fonctionnement continuel de l'ABS Si
     //le véhicule roule et la pédale de frein est enclenchée.
@@ -68,11 +71,12 @@ class ABS{
 
     /*setter*/
 
-    ///**Méthodes privées**///
+    //--Méthodes privées--//
 
     private:
 
-    //but : vérifie l'absence de blocage des roues
+    /** \brief vérifie l'absence de blocage des roues
+     */
     //Une fois un blocage constaté,
     //un premier relachement des freins est executé puis la phase s'arrête
     void phase1(){
@@ -89,7 +93,8 @@ class ABS{
         relacherRoues();
     };
 
-    //but : Réaliser une dichotomie sur les roues ayant un glissement non optimal
+    /** \brief Réaliser une dichotomie sur les roues ayant un glissement non optimal
+     */
     //Après 3 boucles conservant un glissment optimal, cette phase s'arrête
     //Si la pédale
     bool phase2(){
@@ -108,7 +113,7 @@ class ABS{
                 serrerRoues();
             }
             chrgFrein2 = this->i.getChargeFrein();
-            if(chargeFrein > 2*chrgFrein2){
+            if((chargeFrein-chrgFrein2)>0.08){
                 chargeFrein = chrgFrein2;
                 pedale = true;
             }
@@ -116,9 +121,9 @@ class ABS{
         return pedale;
     };//TODO modifier la sortie à TRUE si la pedale de frein est relaché
 
-    //param :
-    //out : booléen définissant si une modification significative des valeurs de glissement des roues à eu lieu
-    //but : Vérifier la conservation du glissement optimal ainsi que le besoin de freiner
+    /** \brief Vérifier la conservation du glissement optimal ainsi que le besoin de freiner
+     * \param[out] booléen définissant si une modification significative des valeurs de glissement des roues à eu lieu.
+     */
     //Si le conducteur lâche suffisamment la pédale, l'ABS s'arrête.
     //Si le véhicule perd/gagne de l'adhérence,
     //les bornes sont réajustées puis la phase 3 est quittée
@@ -130,7 +135,7 @@ class ABS{
             calculGlissement();
             glissementNonOptimal();
             chrgFrein2 = this->i.getChargeFrein();
-            if(chargeFrein > 2*chrgFrein2 || (this->i.getVitesse()<5)){
+            if((chargeFrein-chrgFrein2)>0.08 || (this->i.getVitesse()<5)){
                 chgmtGliss = false;
                 chargeFrein = chrgFrein2;
                 break;
@@ -143,15 +148,18 @@ class ABS{
         return chgmtGliss;
     };
 
-    //param :
-    //in : le nombre de roues à créer/stocker
-    //but : Initialise un tableau contenant les n roues du véhicule simulé. [nécessité de remplacer n par une méthode récupérant cette valeur]
+    /** \brief Initialise un tableau contenant les n roues du véhicule simulé. [nécessité de remplacer n par une méthode récupérant cette valeur]
+     *
+     * \param[in] n le nombre de roues à créer/stocker.
+     *
+     */
     void initialiserRoues(int n){
         for(int i = 0 ; i < n ; i++)
             rouesVehicule.push_back(Roue(this->i.getRayonRoues(i),&(this->i),i));
     };
 
-    //but : calculer le glissement de chaque roue au moment de l'appel.
+    /** \brief calculer le glissement de chaque roue au moment de l'appel.
+     */
     //Met à jour la vitesse angulaire des roues, appel d'une methode[classe Roue] calculant le glissement pour une vitesse donnée en paramêtre
     void calculGlissement(){
         this->i.majDonnees();
@@ -169,7 +177,8 @@ class ABS{
         std::cout << "glissement r"<<i<<": "<< rouesVehicule[i].getGlissement()<< std:: endl;
     };
 
-    //but : Remplir les listes "rouesASerrer" et "rouesARelacher" avec les indices des roues sur lesquelles effectuer des modifications.
+    /** \brief Remplir les listes "rouesASerrer" et "rouesARelacher" avec les indices des roues sur lesquelles effectuer des modifications.
+    */
     void glissementNonOptimal(){
         for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++){
             if(rouesVehicule[i].getGlissement() < GLISSEMENT_OPTIMAL-alpha)
@@ -180,8 +189,8 @@ class ABS{
         }
     };
 
-    //but : Mettre à jour les bornes sur lesquelles la dichotomie est réalisée
-    //boucle 1 : La roue à brusquement perdu de l'adhérence. Les nouvelles bornes sont : [0 - la pression actuelle (devenu trop importante)]
+    /** \brief Mettre à jour les bornes sur lesquelles la dichotomie est réalisée
+     *///boucle 1 : La roue à brusquement perdu de l'adhérence. Les nouvelles bornes sont : [0 - la pression actuelle (devenu trop importante)]
     //boucle 2 : La roue à brusquement gagné de l'adhérence. Les nouvelles bornes sont : [la pression actuelle (devenu trop faible) - 1]
     void modifierBornes(){
         for(int& r : rouesARelacher){
@@ -192,8 +201,8 @@ class ABS{
         }
     };
 
-    //but : détecter un blocage des roues
-    //si le glissement d'une roue s'approche grandement de 1, alors elle est considérée bloquée.
+    /** \brief détecter un blocage des roues
+     *///si le glissement d'une roue s'approche grandement de 1, alors elle est considérée bloquée.
     bool blocageRoues(){
         bool res = false;
         for(unsigned int i = 0 ; i < rouesVehicule.size() ; i++){
@@ -205,7 +214,8 @@ class ABS{
         return res;
     };
 
-    //but : relacher les roues trop serrées par le freinage.
+    /** \brief relacher les roues trop serrées par le freinage.
+     */
     void relacherRoues(){
         for(int& r : rouesARelacher){
             rouesVehicule[r].dichotomie(ChangementPression::RELACHER);
@@ -214,7 +224,8 @@ class ABS{
         rouesARelacher.resize(0);
     };
 
-    //but : serrer les roues pas assez solicitées par le freinage.
+    /** \brief serrer les roues pas assez solicitées par le freinage.
+     */
     void serrerRoues(){
         for(int& r : rouesASerrer){
             rouesVehicule[r].dichotomie(ChangementPression::SERRER);
