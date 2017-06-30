@@ -36,7 +36,7 @@ class BornesDichotomie{
     /*méthodes*/
 
     /** \brief  modifier la valeur de freinage par dichotomie
-     * \param[in] choix l'évolution souhaité d'une étape de dichotomie (Sérrer / Relacher)
+     * \param[in] choix l'évolution souhaité d'une étape de dichotomie (Serrer / Relacher)
      */
     void dichotomie(ChangementPression choix){
         if(index == ZERO_DICHOTOMIE_REALISEE)
